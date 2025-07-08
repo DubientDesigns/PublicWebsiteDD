@@ -1,0 +1,85 @@
+.clients-section {
+    background: #0a0a0a;
+    padding: 4rem 2rem;
+    color: #fff;
+  }
+  
+  .clients-section__text {
+    max-width: 800px;
+    margin: 0 auto 3rem;
+    text-align: center;
+  }
+  
+  .preline {
+    display: block;
+    color: #666;
+    letter-spacing: 0.1em;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .headline {
+    font-size: 2.75rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+  
+  .highlight {
+    background: linear-gradient(90deg, #00f0ff, #005bff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .body {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #ccc;
+    margin-bottom: 1rem;
+  }
+  
+  /* ——— Logo grid styling ——— */
+  .clients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .clients-grid__item {
+    background: #1f1f1f;
+    padding: 1rem;       /* more padding for a bigger plate */
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .clients-grid__item img {
+    max-width: 100%;
+    max-height: 80px;    /* increase logo height */
+    object-fit: contain;
+    filter: grayscale(1) brightness(2) contrast(1.2);
+    transition: filter 0.2s ease, transform 0.2s ease;
+  }
+  
+  .clients-grid__item:hover img {
+    filter:
+      grayscale(1)
+      brightness(2)
+      contrast(1.2)
+      drop-shadow(0 0 4px rgba(0,240,255,0.8));
+    transform: scale(1.05);
+  }
+  
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+    .clients-section {
+      padding: 2rem 1rem;
+    }
+    .headline {
+      font-size: 2rem;
+    }
+  }
+  

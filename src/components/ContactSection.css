@@ -1,0 +1,121 @@
+/* src/components/ContactSection.css */
+
+.contact-section.full-width {
+  width: 100%;
+  padding: 4rem 2rem;
+  background: transparent; /* ← now matches the page bg */
+  color: #eee;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+
+@media (max-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* FORM PANEL */
+.form-title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+.form-title .accent {
+  color: #00ffe8;
+}
+
+.enquiry-form input,
+.enquiry-form select,
+.enquiry-form textarea {
+  width: 100%;
+  background: #111118; /* a hair lighter than the page for legibility */
+  border: 1px solid #333;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.submit-btn {
+  background: #00ffe8;
+  color: #0a0a0f;
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 2rem;
+  box-shadow: 0 0 20px rgba(0, 255, 232, 0.6);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  box-shadow: 0 0 30px rgba(0, 255, 232, 0.9);
+}
+
+.status-msg {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+.status-msg.success {
+  color: #6f6;
+}
+.status-msg.error {
+  color: #f66;
+}
+
+/* INFO PANEL */
+.info-title {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.info-copy {
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  color: #ddd;
+}
+
+.contact-info {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem;
+}
+.contact-info li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+.contact-info li svg {
+  margin-right: 0.75rem;
+  color: #00ffe8;
+  min-width: 1.2rem;
+}
+.contact-info a,
+.contact-info address {
+  color: #ddd;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.social-links a {
+  display: inline-block;
+  margin-right: 0.75rem;
+  font-size: 1.25rem;
+  color: #ddd;
+  transition: color 0.2s, transform 0.2s;
+}
+.social-links a:hover {
+  color: #00ffe8;
+  transform: translateY(-2px);
+}

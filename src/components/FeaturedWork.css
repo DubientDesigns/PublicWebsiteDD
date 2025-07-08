@@ -1,0 +1,107 @@
+/* ─── Section (now full-width) ─────────────────────────────── */
+.featured-section {
+    padding: 6rem 0;               /* top / bottom only, no side padding  */
+    background: #05050a;
+    color: #fff;
+  }
+  
+  /* heading + CTA still sit in a centred container */
+  .featured-head {
+    max-width: 72rem;
+    margin: 0 auto 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2rem;
+  }
+  
+  /* ─── Full-width grid ──────────────────────────────────────── */
+  .featured-grid {
+    display: grid;
+    grid-template-columns: 1fr;    /* single column on phones              */
+    gap: 0;                         /* no space between the two halves      */
+  }
+  
+  @media (min-width: 640px) {       /* two equal halves ≥ 640 px            */
+    .featured-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* ─── Card ─────────────────────────────────────────────────── */
+  .featured-card {
+    position: relative;
+    height: 32vw;                  /* responsive height: 32 % of viewport width */
+    min-height: 18rem;             /* fallback for very narrow windows     */
+    overflow: hidden;
+    background: #0f0f0f;
+    border: none;                  /* flush look                           */
+    transition: transform .3s ease;
+  }
+  
+  @media (min-width: 640px) {
+    .featured-card { border-right: 1px solid #141414; } /* subtle divider */
+  }
+  @media (min-width: 640px) {
+    .featured-card:nth-child(2n) { border-right: none; } /* remove on right card */
+  }
+  
+  /* blurred backdrop */
+  .featured-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(6px);
+    transform: scale(1.05);
+    transition: transform .7s ease;
+  }
+  .featured-card:hover .featured-bg { transform: scale(1.12); }
+  
+  /* gradient overlay for legibility */
+  .featured-grad {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,.35) 100%
+    );
+  }
+  
+  /* ----- inner flex column (video + title) ----- */
+  .featured-card-inner {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .featured-vid {
+    width: 85%;
+    height: 75%;
+    object-fit: cover;
+    border-radius: .5rem;
+    box-shadow: 0 8px 24px rgba(0,255,255,.25);
+    transition: box-shadow .3s ease, filter .3s ease;
+  }
+  .featured-card:hover .featured-vid {
+    box-shadow: 0 12px 32px rgba(0,255,255,.35);
+    filter: brightness(1.05);
+  }
+  
+  /* title under video */
+  .featured-title {
+    margin-top: 1rem;
+    font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+    font-weight: 800;
+    color: #00ffff;
+  }
+  
+  /* cover-link */
+  .featured-link { position: absolute; inset: 0; z-index: 30; }
+  

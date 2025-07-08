@@ -1,0 +1,128 @@
+/* src/components/Hero.css */
+
+/* full‐bleed wrapper */
+.hero-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+/* fade utilities */
+.fadeIn {
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+}
+.fadeOut {
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+
+/* background layers */
+.hero-poster,
+.hero-spline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* overlay text block */
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  z-index: 10;
+  pointer-events: none;
+  padding: 0 1rem;
+}
+.hero-text * {
+  pointer-events: auto;
+}
+
+/* “Pain” line */
+.hero-pain {
+  margin-bottom: 0.5rem;
+  color: #a0ffff;
+  font-style: italic;
+  font-size: 1rem;
+}
+
+/* main headline */
+.hero-text h1 {
+  margin: 0.5rem 0 1rem;
+  font-size: 3.5rem;
+  line-height: 1.2;
+  color: #00ffff;
+  text-shadow: 0 0 20px #00ffff;
+}
+.hero-text .hero-key {
+  color: #fff;
+  text-shadow: 0 0 30px #fff;
+  font-style: italic;
+}
+
+/* sub-copy */
+.hero-text p {
+  margin-bottom: 2rem;
+  font-size: 1.15rem;
+  color: #e0e0e0;
+}
+
+/* CTA group */
+.cta-group {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* base CTA */
+.hero-cta {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+.hero-cta:hover {
+  transform: scale(1.05);
+}
+
+/* filled CTA */
+.hero-cta-filled {
+  background-color: #00ffff;
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+}
+
+/* outline CTA */
+.hero-cta-outline {
+  background: transparent;
+  border: 2px solid #00ffff;
+  color: #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+}
+
+/* socials */
+.hero-socials {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+  .hero-text p {
+    font-size: 1rem;
+  }
+}

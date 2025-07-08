@@ -1,0 +1,115 @@
+.testimonials-section {
+    background-color: #0a0a0a;
+    color: #fff;
+    padding: 4rem 2rem;
+    overflow: hidden;
+  }
+  
+  .ts-heading {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .ts-highlight {
+    background: linear-gradient(90deg, #00f0ff, #005bff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* Carousel container */
+  .ts-carousel {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+  
+  /* Scrolling track */
+  .ts-track {
+    display: flex;
+    gap: 1.5rem;
+    animation: ts-scroll 30s linear infinite;
+  }
+  
+  /* Pause scroll on hover */
+  .ts-carousel:hover .ts-track {
+    animation-play-state: paused;
+  }
+  
+  /* Testimonial card */
+  .ts-card {
+    flex: 0 0 300px;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  /* Quote text */
+  .ts-quote {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    color: #ddd;
+  }
+  
+  /* Author row */
+  .ts-author {
+    display: flex;
+    align-items: center;
+  }
+  
+  .ts-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-right: 1rem;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+    padding: 4px;
+  }
+  
+  .ts-name {
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .ts-role {
+    font-size: 0.875rem;
+    color: #aaa;
+    margin: 0;
+  }
+  
+  /* Scrolling animation */
+  @keyframes ts-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  /* Responsive: reduce card width */
+  @media (max-width: 768px) {
+    .ts-track {
+      animation-duration: 40s;
+    }
+    .ts-card {
+      flex: 0 0 80%;
+      max-width: 80%;
+    }
+  }
+
+/* ServicesShowcase.css */
+
+/* Gradient text utilities */
+.text-gradient-cyan {
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-blue {
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

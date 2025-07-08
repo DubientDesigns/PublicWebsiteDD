@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+/* reset default margins and make the bg match your hero */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #000; /* or whatever dark color you’re using */
+}
+
+/* ensure your root div also fills the screen */
+#root {
+  min-height: 100vh;
+  background: inherit;
+}
+:root {
+  --brand-blue: #00ffff;
+  --brand-grad: linear-gradient(
+    90deg,
+    rgba(0, 255, 255, 1) 0%,
+    rgba(64, 224, 208, 1) 50%,
+    rgba(0, 191, 255, 1) 100%
+  );
+}
