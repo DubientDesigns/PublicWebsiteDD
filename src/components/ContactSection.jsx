@@ -1,5 +1,5 @@
 // src/components/ContactSection.jsx
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import {
   FaEnvelope,
@@ -12,6 +12,8 @@ import {
 } from "react-icons/fa";
 import "./ContactSection.css";
 import { ObfuscatedEmailLink, OBFUSCATED_CONTACT_EMAIL_DISPLAY } from "../utils/emailObfuscation";
+import { validateForm, checkRateLimit, recordSubmission, detectSuspiciousBehavior } from "../utils/formValidation";
+import { trackSpamAttempt } from "../utils/spamMonitoring";
 
 export default function ContactSection() {
   const [form, setForm] = useState({
@@ -27,27 +29,116 @@ export default function ContactSection() {
     typeof window !== 'undefined' && window.location.search.includes('success=1')
   );
   const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStartTime, setFormStartTime] = useState(null);
   const recaptchaRef = useRef(null);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleFormSubmit = (e) => {
-    // Check honeypot field - if filled, it's likely a bot
-    if (form.honeypot) {
-      e.preventDefault();
-      console.log('Bot detected - form submission blocked');
-      return false;
+  // Track when user starts filling the form
+  useEffect(() => {
+    if (!formStartTime) {
+      setFormStartTime(Date.now());
     }
-    
-    // Check reCAPTCHA - uncomment when you have a site key
-    // if (!recaptchaToken) {
-    //   e.preventDefault();
-    //   alert('Please complete the reCAPTCHA verification');
-    //   return false;
-    // }
-    
-    setTimeout(() => setSubmitted(true), 100); // Delay to allow Formspree to process
+  }, [form.firstName, form.lastName, form.email, formStartTime]);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    // Clear field error when user starts typing
+    if (formErrors[e.target.name]) {
+      setFormErrors({ ...formErrors, [e.target.name]: '' });
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormErrors({});
+
+    try {
+      // 1. Check honeypot field - if filled, it's likely a bot
+      if (form.honeypot) {
+        trackSpamAttempt('honeypot', { form: form });
+        console.log('Bot detected - form submission blocked');
+        setIsSubmitting(false);
+        return false;
+      }
+
+      // 2. Check rate limiting
+      if (!checkRateLimit()) {
+        trackSpamAttempt('rate_limit');
+        setFormErrors({ general: 'Too many submissions. Please wait before trying again.' });
+        setIsSubmitting(false);
+        return false;
+      }
+
+      // 3. Validate form data
+      const validation = validateForm(form);
+      if (!validation.isValid) {
+        setFormErrors(validation.errors);
+        if (validation.errors.spam) {
+          trackSpamAttempt('validation', { errors: validation.errors });
+        }
+        setIsSubmitting(false);
+        return false;
+      }
+
+      // 4. Check for suspicious behavior
+      const timeToFill = formStartTime ? Date.now() - formStartTime : 0;
+      const suspiciousIndicators = detectSuspiciousBehavior(form, timeToFill);
+      if (suspiciousIndicators.length > 0) {
+        trackSpamAttempt('suspicious_behavior', { 
+          indicators: suspiciousIndicators,
+          timeToFill 
+        });
+        // Don't block, but log for monitoring
+        console.warn('Suspicious behavior detected:', suspiciousIndicators);
+      }
+
+      // 5. Check reCAPTCHA - uncomment when you have a site key
+      // if (!recaptchaToken) {
+      //   setFormErrors({ general: 'Please complete the reCAPTCHA verification' });
+      //   setIsSubmitting(false);
+      //   return false;
+      // }
+
+      // 6. Record successful submission attempt
+      recordSubmission();
+
+      // 7. Submit to Formspree
+      const formData = new FormData(e.target);
+      const response = await fetch(e.target.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        // Reset form
+        setForm({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          service: "",
+          message: "",
+          honeypot: "",
+        });
+        setRecaptchaToken(null);
+        if (recaptchaRef.current) {
+          recaptchaRef.current.reset();
+        }
+      } else {
+        throw new Error('Form submission failed');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setFormErrors({ general: 'Failed to submit form. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleRecaptchaChange = (token) => {
@@ -69,68 +160,111 @@ export default function ContactSection() {
               <p className="text-gray-400">We'll get back to you as soon as possible.</p>
             </div>
           ) : (
-            <form
+            <>
+              {/* General error display */}
+              {formErrors.general && (
+                <div className="mb-4 p-4 bg-red-900/20 border border-red-500 rounded-lg">
+                  <p className="text-red-400 text-sm">{formErrors.general}</p>
+                </div>
+              )}
+              <form
               action="https://formspree.io/f/xrbkwgyo"
               method="POST"
               className="enquiry-form"
               onSubmit={handleFormSubmit}
             >
               <div className="two-cols">
-                <input
-                  name="firstName"
-                  type="text"
-                  placeholder="First Name *"
-                  value={form.firstName}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  name="lastName"
-                  type="text"
-                  placeholder="Last Name *"
-                  value={form.lastName}
-                  onChange={handleChange}
-                  required
-                />
+                <div>
+                  <input
+                    name="firstName"
+                    type="text"
+                    placeholder="First Name *"
+                    value={form.firstName}
+                    onChange={handleChange}
+                    className={formErrors.firstName ? 'error' : ''}
+                    required
+                  />
+                  {formErrors.firstName && (
+                    <p className="text-red-400 text-xs mt-1">{formErrors.firstName}</p>
+                  )}
+                </div>
+                <div>
+                  <input
+                    name="lastName"
+                    type="text"
+                    placeholder="Last Name *"
+                    value={form.lastName}
+                    onChange={handleChange}
+                    className={formErrors.lastName ? 'error' : ''}
+                    required
+                  />
+                  {formErrors.lastName && (
+                    <p className="text-red-400 text-xs mt-1">{formErrors.lastName}</p>
+                  )}
+                </div>
               </div>
-              <input
-                name="email"
-                type="email"
-                placeholder="Company Email *"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-              <input
-                name="phone"
-                type="tel"
-                placeholder="Contact Number *"
-                value={form.phone}
-                onChange={handleChange}
-                required
-              />
-              <select
-                name="service"
-                value={form.service}
-                onChange={handleChange}
-                required
-              >
-                <option value="" disabled>
-                  Required component *
-                </option>
-                <option>Website</option>
-                <option>SEO</option>
-                <option>App</option>
-                <option>Software</option>
-              </select>
-              <textarea
-                name="message"
-                rows="5"
-                placeholder="Message *"
-                value={form.message}
-                onChange={handleChange}
-                required
-              />
+              <div>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Company Email *"
+                  value={form.email}
+                  onChange={handleChange}
+                  className={formErrors.email ? 'error' : ''}
+                  required
+                />
+                {formErrors.email && (
+                  <p className="text-red-400 text-xs mt-1">{formErrors.email}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  name="phone"
+                  type="tel"
+                  placeholder="Contact Number *"
+                  value={form.phone}
+                  onChange={handleChange}
+                  className={formErrors.phone ? 'error' : ''}
+                  required
+                />
+                {formErrors.phone && (
+                  <p className="text-red-400 text-xs mt-1">{formErrors.phone}</p>
+                )}
+              </div>
+              <div>
+                <select
+                  name="service"
+                  value={form.service}
+                  onChange={handleChange}
+                  className={formErrors.service ? 'error' : ''}
+                  required
+                >
+                  <option value="" disabled>
+                    Required component *
+                  </option>
+                  <option>Website</option>
+                  <option>SEO</option>
+                  <option>App</option>
+                  <option>Software</option>
+                </select>
+                {formErrors.service && (
+                  <p className="text-red-400 text-xs mt-1">{formErrors.service}</p>
+                )}
+              </div>
+              <div>
+                <textarea
+                  name="message"
+                  rows="5"
+                  placeholder="Message *"
+                  value={form.message}
+                  onChange={handleChange}
+                  className={formErrors.message ? 'error' : ''}
+                  required
+                />
+                {formErrors.message && (
+                  <p className="text-red-400 text-xs mt-1">{formErrors.message}</p>
+                )}
+              </div>
               
               {/* Honeypot field - hidden from users, visible to bots */}
               <input
@@ -164,10 +298,12 @@ export default function ContactSection() {
               <button
                 type="submit"
                 className="glow-button submit-btn"
+                disabled={isSubmitting}
               >
-                Submit Enquiry
+                {isSubmitting ? 'Submitting...' : 'Submit Enquiry'}
               </button>
             </form>
+            </>
           )}
         </div>
 

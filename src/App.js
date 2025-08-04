@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import SpamMonitoringDashboard from "./components/SpamMonitoringDashboard";
 
 import Home from "./pages/Home";
 import AboutPage from "./pages/About";
@@ -65,6 +66,9 @@ export default function App() {
         {/* <Route path="/industries/real-estate" element={<RealEstatePage />} /> */}
         {/* <Route path="/industries/freelancers" element={<FreelancersPage />} /> */}
       </Routes>
+      
+      {/* Spam Monitoring Dashboard - only visible in development */}
+      <SpamMonitoringDashboard />
     </div>
   );
 }

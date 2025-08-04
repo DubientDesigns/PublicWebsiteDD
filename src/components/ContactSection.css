@@ -119,3 +119,55 @@
   color: #00ffe8;
   transform: translateY(-2px);
 }
+
+/* Enhanced form validation styles */
+.enquiry-form input.error,
+.enquiry-form select.error,
+.enquiry-form textarea.error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
+}
+
+.enquiry-form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.enquiry-form button:disabled:hover {
+  transform: none;
+}
+
+/* Error message styles */
+.text-red-400 {
+  color: #f87171;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+/* General error container */
+.bg-red-900\/20 {
+  background-color: rgba(127, 29, 29, 0.2);
+}
+
+.border-red-500 {
+  border-color: #ef4444;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
