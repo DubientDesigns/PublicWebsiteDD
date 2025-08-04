@@ -1,0 +1,50 @@
+# Netlify configuration for spam protection and performance
+
+[build]
+  publish = "build"
+  command = "npm run build"
+
+# Form spam protection settings
+[forms]
+  # Enable Netlify's built-in spam filtering
+  spam_filtering = true
+
+# Rate limiting for form submissions
+[[headers]]
+  for = "/contact"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Security headers for all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Redirect rules to prevent common bot patterns
+[[redirects]]
+  from = "/wp-admin/*"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/wp-login.php"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/administrator/*"
+  to = "/404.html"
+  status = 404
+
+# Cache static assets
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

@@ -1,5 +1,6 @@
 // src/components/ContactSection.jsx
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import {
   FaEnvelope,
   FaPhoneAlt,
@@ -10,6 +11,7 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import "./ContactSection.css";
+import { ObfuscatedEmailLink, OBFUSCATED_CONTACT_EMAIL_DISPLAY } from "../utils/emailObfuscation";
 
 export default function ContactSection() {
   const [form, setForm] = useState({
@@ -19,48 +21,37 @@ export default function ContactSection() {
     phone: "",
     service: "",
     message: "",
+    honeypot: "", // Honeypot field for bot detection
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(
+    typeof window !== 'undefined' && window.location.search.includes('success=1')
+  );
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const recaptchaRef = useRef(null);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch("http://localhost:5000/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.firstName + " " + form.lastName,
-          email: form.email,
-          message:
-            `Phone: ${form.phone}\nService: ${form.service}\nMessage: ${form.message}`,
-        }),
-      });
-      if (res.ok) {
-        setSubmitted(true);
-        setForm({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          service: "",
-          message: "",
-        });
-      } else {
-        const data = await res.json();
-        setError(data.error || "Failed to send message.");
-      }
-    } catch (err) {
-      setError("Failed to send message. Please try again later.");
-    } finally {
-      setLoading(false);
+  const handleFormSubmit = (e) => {
+    // Check honeypot field - if filled, it's likely a bot
+    if (form.honeypot) {
+      e.preventDefault();
+      console.log('Bot detected - form submission blocked');
+      return false;
     }
+    
+    // Check reCAPTCHA - uncomment when you have a site key
+    // if (!recaptchaToken) {
+    //   e.preventDefault();
+    //   alert('Please complete the reCAPTCHA verification');
+    //   return false;
+    // }
+    
+    setTimeout(() => setSubmitted(true), 100); // Delay to allow Formspree to process
+  };
+
+  const handleRecaptchaChange = (token) => {
+    setRecaptchaToken(token);
   };
 
   return (
@@ -79,8 +70,10 @@ export default function ContactSection() {
             </div>
           ) : (
             <form
-              onSubmit={handleFormSubmit}
+              action="https://formspree.io/f/xrbkwgyo"
+              method="POST"
               className="enquiry-form"
+              onSubmit={handleFormSubmit}
             >
               <div className="two-cols">
                 <input
@@ -138,14 +131,42 @@ export default function ContactSection() {
                 onChange={handleChange}
                 required
               />
+              
+              {/* Honeypot field - hidden from users, visible to bots */}
+              <input
+                name="honeypot"
+                type="text"
+                value={form.honeypot}
+                onChange={handleChange}
+                style={{ 
+                  position: 'absolute', 
+                  left: '-9999px', 
+                  width: '1px', 
+                  height: '1px',
+                  opacity: 0,
+                  pointerEvents: 'none'
+                }}
+                tabIndex="-1"
+                autoComplete="off"
+                aria-hidden="true"
+              />
+              
+              {/* reCAPTCHA - Uncomment and add your site key */}
+              {/* <div className="recaptcha-container" style={{ marginBottom: '1rem' }}>
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey="YOUR_RECAPTCHA_SITE_KEY_HERE"
+                  onChange={handleRecaptchaChange}
+                  theme="dark"
+                />
+              </div> */}
+              
               <button
                 type="submit"
                 className="glow-button submit-btn"
-                disabled={loading}
               >
-                {loading ? "Sending..." : "Submit Enquiry"}
+                Submit Enquiry
               </button>
-              {error && <div className="status-msg error">{error}</div>}
             </form>
           )}
         </div>
@@ -160,9 +181,9 @@ export default function ContactSection() {
           <ul className="contact-info">
             <li>
               <FaEnvelope />
-              <a href="mailto:Contact@DubientDesigns.com">
+              <ObfuscatedEmailLink obfuscatedEmail={OBFUSCATED_CONTACT_EMAIL_DISPLAY}>
                 Contact@DubientDesigns.com
-              </a>
+              </ObfuscatedEmailLink>
             </li>
             <li>
               <FaPhoneAlt />

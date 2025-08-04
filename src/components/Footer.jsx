@@ -1,6 +1,7 @@
 import React from "react";
 import { FaInstagram, FaFacebookF, FaWhatsapp } from "react-icons/fa";
 import logo from "../assets/logo.png";
+import { ObfuscatedEmailLink, OBFUSCATED_CONTACT_EMAIL_DISPLAY } from "../utils/emailObfuscation";
 
 export default function Footer() {
   return (
@@ -139,12 +140,12 @@ export default function Footer() {
               <div>
                 <h6 className="text-sm font-semibold uppercase">Email us</h6>
                 <p className="mt-2 text-lg font-bold">
-                  <a
-                    href="mailto:Contact@dubientdesigns.com"
+                  <ObfuscatedEmailLink
+                    obfuscatedEmail={OBFUSCATED_CONTACT_EMAIL_DISPLAY}
                     className="hover:text-white"
                   >
                     Contact@dubientdesigns.com
-                  </a>
+                  </ObfuscatedEmailLink>
                 </p>
               </div>
             </div>
